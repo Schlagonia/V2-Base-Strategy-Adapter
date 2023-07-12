@@ -32,7 +32,7 @@ NOTE: You will need to adjust the import path on line 8 of `BaseStrategyAdapter.
 
 ### Install Ape and all dependencies
 
-    pip install -r requirements-dev.txt
+    pip install -r requirements.txt
     
     yarn
     

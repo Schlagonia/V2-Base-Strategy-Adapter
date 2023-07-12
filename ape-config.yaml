@@ -9,6 +9,7 @@ plugins:
   - name: infura
 
 default_ecosystem: ethereum
+
 dependencies:
   - name: openzeppelin
     github: OpenZeppelin/openzeppelin-contracts

@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 // Feel free to change the license, but this is what we use
-
-pragma solidity ^0.8.15;
+pragma solidity 0.8.18;
 pragma experimental ABIEncoderV2;
 
 // These are the core Yearn libraries
-import {BaseStrategy, StrategyParams, ERC20} from "@yearnV2/BaseStrategy.sol";
+import {BaseStrategy, StrategyParams} from "@yearnV2/BaseStrategy.sol";
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
@@ -35,11 +34,16 @@ abstract contract BaseStrategyAdapter is BaseStrategy {
                     NEEDED TO OVERRIDEN BY STRATEGIST
     //////////////////////////////////////////////////////////////*/
 
-    function _invest(uint256 assets) internal virtual;
+    function _deployFunds(uint256 assets) internal virtual;
 
     function _freeFunds(uint256 amount) internal virtual;
 
-    function _totalInvested() internal virtual returns (uint256 _invested);
+    function _harvestAndReport()
+        internal
+        virtual
+        returns (uint256 _totalAssets);
+
+    function _emergencyWithdraw(uint256 _amount) internal virtual;
 
     /*//////////////////////////////////////////////////////////////
                     OPTIONAL TO OVERRIDE BY STRATEGIST
@@ -69,7 +73,7 @@ abstract contract BaseStrategyAdapter is BaseStrategy {
         returns (uint256 _profit, uint256 _loss, uint256 _debtPayment)
     {
         // _totalInvested should account for all funds the strategy curently has
-        uint256 totalAssets = _totalInvested();
+        uint256 totalAssets = _harvestAndReport();
         uint256 totalDebt = vault.strategies(address(this)).totalDebt;
 
         if (totalDebt > totalAssets) {
@@ -98,7 +102,7 @@ abstract contract BaseStrategyAdapter is BaseStrategy {
                 looseWant > _debtOutstanding ? looseWant - _debtOutstanding : 0
             );
         } else {
-            _invest(looseWant);
+            _deployFunds(looseWant);
         }
     }
 
@@ -123,7 +127,7 @@ abstract contract BaseStrategyAdapter is BaseStrategy {
     }
 
     function liquidateAllPositions() internal override returns (uint256) {
-        _freeFunds(vault.strategies(address(this)).totalDebt);
+        _emergencyWithdraw(vault.strategies(address(this)).totalDebt);
         return want.balanceOf(address(this));
     }
 
