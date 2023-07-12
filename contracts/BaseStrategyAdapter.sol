@@ -115,11 +115,11 @@ abstract contract BaseStrategyAdapter is BaseStrategy {
             _freeFunds(_amountNeeded - looseWant);
         }
 
-        uint256 totalAssets = want.balanceOf(address(this));
-        if (_amountNeeded > totalAssets) {
-            _liquidatedAmount = totalAssets;
+        looseWant = want.balanceOf(address(this));
+        if (_amountNeeded > looseWant) {
+            _liquidatedAmount = looseWant;
             unchecked {
-                _loss = _amountNeeded - totalAssets;
+                _loss = _amountNeeded - looseWant;
             }
         } else {
             _liquidatedAmount = _amountNeeded;
