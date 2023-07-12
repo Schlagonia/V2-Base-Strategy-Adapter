@@ -17,8 +17,9 @@ contract Strategy is BaseStrategyAdapter {
 
     constructor(
         address _asset,
+        string memory _name,
         address _vault
-    ) BaseStrategyAdapter(_asset, "STGY Name", _vault) {}
+    ) BaseStrategyAdapter(_asset, _name, _vault) {}
 
     /*//////////////////////////////////////////////////////////////
                 NEEDED TO BE OVERRIDEN BY STRATEGIST

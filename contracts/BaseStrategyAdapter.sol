@@ -8,9 +8,21 @@ import {BaseStrategy, StrategyParams} from "@yearnV2/BaseStrategy.sol";
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
+interface ITokenizedStrategy {
+    function isShutdown() external view returns (bool);
+
+    function totalIdle() external view returns (uint256);
+
+    function totalDebt() external view returns (uint256);
+
+    function totalAssets() external view returns (uint256);
+}
+
 abstract contract BaseStrategyAdapter is BaseStrategy {
     address internal asset;
     string internal _name;
+    // Used to simulate the TokenizedStrategy variable in V3 strategies.
+    ITokenizedStrategy internal TokenizedStrategy;
 
     // forward the V3 modifier to the V2 version
     modifier onlyManagement() {
@@ -26,6 +38,7 @@ abstract contract BaseStrategyAdapter is BaseStrategy {
         require(_asset == address(want), "Wrong token");
         asset = _asset;
         _name = _name_;
+        TokenizedStrategy = ITokenizedStrategy(address(this));
     }
 
     // ******** OVERRIDE THESE METHODS IN THE IMPLEMENTATION CONTRACT ************ \\
@@ -53,6 +66,26 @@ abstract contract BaseStrategyAdapter is BaseStrategy {
 
     function tendTrigger() public view virtual returns (bool) {
         return false;
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                    TOKENIZED STRATEGY REPLACEMENTS
+    //////////////////////////////////////////////////////////////*/
+
+    function isShutdown() external view returns (bool) {
+        return emergencyExit;
+    }
+
+    function totalIdle() public view returns (uint256) {
+        return want.balanceOf(address(this));
+    }
+
+    function totalDebt() external view returns (uint256) {
+        return estimatedTotalAssets() - totalIdle();
+    }
+
+    function totalAssets() external view returns (uint256) {
+        return estimatedTotalAssets();
     }
 
     // ******** BASE STRATEGY FUNCTIONS TO ROUTE TO V3 IMPLEMENTATION ************ \\
