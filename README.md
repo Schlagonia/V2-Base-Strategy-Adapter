@@ -4,7 +4,7 @@ This repo is to allow you to write a strategy for YearnV3 that will work with a 
 
 All adaptations are already implemented in BaseStrategyAdapter.sol.
 
-You will only need to override the three functions in Strategy.sol of '_invest', 'freeFunds' and '_totalInvested'. With the option to also override '_tend' and 'tendTrigger' if needed.
+You will only need to override the functions in Strategy.sol of '_deployFunds', '_freeFunds', '_harvestAndReport' and '_emergencyWithdraw'. With the option to also override '_tend' and 'tendTrigger' if needed.
 
 NOTE: This cannot be used for V2 Gen lender plugins. Plugins should be ported completely to V3 and not use an adapter using the [Tokenized Strategy Ape Mix](https://github.com/Schlagonia/tokenized-strategy-ape-mix).
 
